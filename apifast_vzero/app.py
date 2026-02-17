@@ -17,9 +17,9 @@ app = FastAPI()
 def read_root():
     return {'message': 'Hello World!'}
 
-@app.get(
+"""@app.get(
     '/html', status_code=HTTPStatus.OK,
       response_class=HTMLResponse
       )
 def read_html():
-    return '<h1>Hello World!</h1>'
+    return '<h1>Hello World!</h1>'"""
