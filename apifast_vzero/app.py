@@ -1,25 +1,22 @@
 from http import HTTPStatus
-from fastapi.responses import HTMLResponse
+
 from fastapi import FastAPI
 
-from apifast_vzero.schemas import message
+from apifast_vzero.apifast_vzero.schemas import Message, UserSchema
+
+app = FastAPI(
+    title='API Fast VZero',
+    description='API de exemplo para o curso de FastAPI',
+    version='0.1.0',
+)
 
 
-app = FastAPI()
-
-
-#por padrão, o FastAPI retorna um JSON, mas podemos retornar HTML usando a classe HTMLResponse
-@app.get(
-        '/', status_code=HTTPStatus.OK,
-          response_class=HTMLResponse,
-          response_model=message
-          )
+# por padrão, o FastAPI retorna um JSON
+@app.get('/', status_code=HTTPStatus.OK, response_model=Message)
 def read_root():
     return {'message': 'Hello World!'}
 
-"""@app.get(
-    '/html', status_code=HTTPStatus.OK,
-      response_class=HTMLResponse
-      )
-def read_html():
-    return '<h1>Hello World!</h1>'"""
+
+@app.post('/users/')
+def create_user(user: UserSchema):
+    return user
