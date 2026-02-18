@@ -65,8 +65,8 @@ addopts = "-p no:warnings" # Ignora os avisos durante os testes
 [tool.taskipy.tasks]
 lint = "ruff check"
 format = "ruff format"
-run = "fastapi dev apifast_vzero/app.py"
-test = "pytest -s -x --cov=apifast_vzero -v"
+run = "uvicorn apifast_vzero.app:app"
+test = "pytest -s -x --cov=tests -v"
 
 # hooks para automatizar tarefas antes de outras tarefas
 pre_format = "ruff check --fix"
@@ -74,3 +74,11 @@ pre_test = "task lint"
 
 # hook para gerar o relatório de cobertura em HTML após os testes
 post_test = 'coverage html'
+
+###############################################################################
+#POETRY
+###############################################################################
+[tool.poetry]
+packages = [
+    { include = "apifast_vzero" }
+]
