@@ -52,6 +52,10 @@ select = [
     "PT", # boas praticas do pytest
 ]
 
+[tool.ruff.lint.per-file-ignores]
+"tests/**/*.py" = ["B008"] # Ignora especificamente o erro de função no valor padrão
+
+
 [tool.ruff.format]
 preview = true
 quote-style = 'single' # ou "double" para aspas duplas
@@ -71,6 +75,9 @@ lint = "ruff check"
 format = "ruff format"
 run = "uvicorn apifast_vzero.app:app"
 test = "pytest --cov=apifast_vzero --cov-report=term-missing"
+
+# Gera o relatório de cobertura em HTML e abre no navegador
+coverage = "zen-browser htmlcov/index.html"
 
 # hooks para automatizar tarefas antes de outras tarefas
 pre_format = "ruff check --fix"

@@ -1,5 +1,7 @@
 from http import HTTPStatus
 
+from apifast_vzero.schemas import UserPublic
+
 
 def test_read_root_deve_retornar_Hello_world(client):
 
@@ -31,12 +33,18 @@ def test_read_users_deve_retornar_lista_de_usuarios(client):
     response = client.get('/users/')
 
     assert response.status_code == HTTPStatus.OK
-    assert response.json() == {
-        'users': [{'id': 1, 'username': 'testuser', 'email': 'testuser@example.com'}]
-    }
+    assert response.json() == {'users': []}
 
 
-def test_update_user_deve_atualizar_usuario(client):
+def test_read_users_with_read_users(client, user):
+    user_schema = UserPublic.model_validate(user).model_dump()
+    response = client.get('/users/')
+
+    assert response.status_code == HTTPStatus.OK
+    assert response.json() == {'users': [user_schema]}
+
+
+def test_update_user_deve_atualizar_usuario(client, user):
     response = client.put(
         '/users/1',
         json={
@@ -85,11 +93,12 @@ def test_update_user_id_invalido(client):
     assert response.status_code == HTTPStatus.NOT_FOUND
 
 
-def test_delete_user_nao_encontrado(client):
+def test_delete_user(client, user):
     # Tenta deletar um usuário que está além do tamanho da lista
-    response = client.delete('/users/999')
-    assert response.status_code == HTTPStatus.NOT_FOUND
-    assert response.json() == {'detail': 'Não achei'}
+    response = client.delete('/users/1')
+
+    assert response.status_code == HTTPStatus.OK
+    assert response.json() == {'message': 'Usuário deletado com sucesso'}
 
 
 def test_delete_user_id_negativo(client):
@@ -112,6 +121,29 @@ def test_get_user_OK(client):
     assert response.status_code == HTTPStatus.OK
     assert response.json()['username'] == 'chris'
     assert response.json()['id'] == 1
+
+
+def test_update_integrity_error(client, user):
+    # Cria um segundo usuário para ter um email duplicado
+    client.post(
+        '/users',
+        json={
+            'username': 'anotheruser',
+            'email': 'anotheruser@example.com',
+            'password': 'anotherpassword',
+        },
+    )
+    # mudadendo o usuario
+    response = client.put(
+        f'/users/{user.id}',
+        json={
+            'username': 'testuser',
+            'email': 'testuser@example.com',
+            'password': '123',
+        },
+    )
+    assert response.status_code == HTTPStatus.CONFLICT
+    assert response.json() == {'detail': 'Username ou email já existe'}
 
 
 def test_get_user_not_found(client):
